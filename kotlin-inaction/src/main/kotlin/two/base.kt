@@ -1,6 +1,9 @@
 package two
 
 import two.Color.*
+import java.lang.IllegalArgumentException
+import java.util.TreeMap
+
 /**
  * @author donghyi.seo
  * @since 2023.02.02
@@ -38,6 +41,40 @@ fun main(args: Array<String>) {
     println("when : ${getWarmth(Color.YELLOW)}") //when 분기조건 묶기
     println("when : ${mix(Color.YELLOW, Color.RED)}") //when에서 임의의 객체를 함께 사용
     println("when : ${mixOptimized(Color.YELLOW, Color.RED)}") //위 mix 함수 호출시 set 인스턴스매번생성 하는 것을 다른코드로 짠것
+
+    //스마트 캐스트 : 타입검사와 타입캐스트 조합
+    println("smart cast eval : ${eval(Sum(Sum(Num(1), Num(2)), Num(4)))}")
+    println("smart cast evalRefactoring(use when) : ${eval(Sum(Sum(Num(1), Num(2)), Num(4)))}")
+
+    //이터레이션
+    for (i in 1..100) {
+        println(fizzBuzz(i))
+    }
+    //이터레이션 증가값 (100 downTo 1 은 역방향 수열을 만든다 그뒤에 step2는 2씩 마이너스한다는것)
+    for (i in 100 downTo 1 step 2) {
+        println(i);
+    }
+
+    for (c in 'F' downTo 'A' step 1) {
+        println(c);
+    }
+
+    //map에 대한 이터레이션
+    val binaryReps = TreeMap<Char, String>() //키에 대해 정렬하기위해 tree map 사용
+    for (c in 'A'..'F') {
+        val binary = Integer.toBinaryString(c.code.toInt()) //2진법으로 변환한다 -> c.toInt()는 deprecated
+        binaryReps[c] = binary
+    }
+    for ((letter, binary) in binaryReps) {
+        //letter는 key , binary는 값
+        println("map iteration binary (key, value) $letter = $binary")
+    }
+
+    val list = arrayListOf("10", "11", "1001")
+    for ((index, element) in list.withIndex()) {
+        println("list iteration key, value $index = $element");
+    }
+
 
 }
 
@@ -77,6 +114,7 @@ fun useString() {
     println("Hello $str");
     println("Hello ${if (str == "kotlin") "kotlin" else str}")
 }
+
 
 fun simpleMax2(a:Int, b:Int) = if (a > b) a else b
 
@@ -164,3 +202,39 @@ fun mixOptimized(c1: Color, c2: Color) = when {
     else -> throw Exception("Dirty Color")
 }
 
+/**
+ * 스마트 캐스트 : 타입검사와 타입캐스트 조합
+ */
+interface Expr
+class Num(val value: Int) : Expr
+class Sum(val left: Expr, val right: Expr) : Expr
+
+//java 스타일 식계산
+fun eval(e: Expr): Int {
+    if (e is Num) {
+        val n = e as Num
+        return n.value
+    }
+    if (e is Sum) {
+        return eval(e.right) + eval(e.left)
+    }
+    throw IllegalArgumentException("Unknown expression")
+}
+
+//위 eval 함수를 when 방식으로
+fun evalRefactoring(e: Expr) : Int = when(e) {
+    is Num -> e.value
+    is Sum -> evalRefactoring(e.right) + evalRefactoring(e.left)
+    else -> throw IllegalArgumentException("Unknown expression")
+}
+
+/**
+ * 2.4 대상을 이터레이션 : while과 for 루프
+ */
+val oneToThen = 1..10
+fun fizzBuzz(i: Int) = when {
+    i % 15 == 0 -> "FizzBuzz"
+    i % 3 == 0 -> "Fizz"
+    i % 5 == 0 -> "Buzz"
+    else -> "$i"
+}
