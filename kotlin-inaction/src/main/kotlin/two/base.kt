@@ -1,5 +1,6 @@
 package two
 
+import two.Color.*
 /**
  * @author donghyi.seo
  * @since 2023.02.02
@@ -28,6 +29,15 @@ fun main(args: Array<String>) {
     //커스텀 프로퍼티
     val rectangle = Rectangle(41, 43)
     println("rectable isSquare : ${rectangle.isSquare}")
+
+    //enum
+    println("enum : ${Color.BLUE.rgb()}")
+
+    //when
+    println("when : ${getMnemonic(Color.YELLOW)}")
+    println("when : ${getWarmth(Color.YELLOW)}") //when 분기조건 묶기
+    println("when : ${mix(Color.YELLOW, Color.RED)}") //when에서 임의의 객체를 함께 사용
+    println("when : ${mixOptimized(Color.YELLOW, Color.RED)}") //위 mix 함수 호출시 set 인스턴스매번생성 하는 것을 다른코드로 짠것
 
 }
 
@@ -98,3 +108,59 @@ class Rectangle(val height: Int, val width: Int) {
             return height == width
         }
 }
+
+/**
+ * enum
+ */
+enum class Color (
+    val r: Int, val g: Int, val b: Int
+) {
+    RED(255, 0, 0), ORANGE(255, 165, 0),
+    YELLOW(255, 255, 0), GREEN(0, 255, 0), BLUE(0, 0, 255);
+
+    fun rgb() = (r * 256 + g) * 256 + b;
+}
+
+/**
+ * when
+ * java와 달리 break가 필요없다.
+ *
+ */
+fun getMnemonic(color : Color) =
+    when (color) {
+        Color.RED -> "Richard"
+        Color.ORANGE -> "Of"
+        Color.YELLOW -> "York"
+        Color.GREEN -> "York"
+        Color.BLUE -> "York"
+    }
+
+//when 분기 조건 묶기
+fun getWarmth(color : Color) = when(color) {
+    Color.RED, Color.ORANGE, Color.YELLOW-> "warm"
+    Color.GREEN -> "neutral"
+    Color.BLUE -> "cold"
+}
+
+//when과 임의의 객체를 함께 사용
+//java에서 분기조건 상수, 리터럴만 사용가능한 것에 비해 코틀린 when의 분기조건은 임의의 객체를 허용한다.
+fun mix(c1: Color, c2:Color) = when(setOf(c1, c2)) {
+    setOf(Color.RED, Color.YELLOW) -> Color.ORANGE
+    setOf(Color.GREEN, Color.BLUE) -> Color.YELLOW
+    else -> throw Exception("Dirty Color")
+}
+
+/**
+ * when 인자 없는 when 사용
+ * 위 mix함수는 비효율적임 : 호출될 때마다 인자루 주어진 두색이 when의 분기조건에 있는 다른 두색과 같은비 비교하기위해
+ * set인스턴스를 매번 생성하게됨 (가비지 객체가 늘어남)
+ *
+ * 해결 : 인자가 없는 when 식을 사용하면 불필요한 객체 생서을 막을수있다.
+ * 하지만 가독성이 떨어지수도있음
+ */
+fun mixOptimized(c1: Color, c2: Color) = when {
+    (c1 == RED && c2 == YELLOW) || (c1 == YELLOW && c2 == RED) -> ORANGE
+    (c1 == GREEN && c2 == BLUE) || (c1 == BLUE && c2 == GREEN) -> YELLOW
+    else -> throw Exception("Dirty Color")
+}
+
