@@ -1,7 +1,10 @@
 package two
 
 import two.Color.*
+import java.io.BufferedReader
+import java.io.StringReader
 import java.lang.IllegalArgumentException
+import java.lang.NumberFormatException
 import java.util.TreeMap
 
 /**
@@ -74,6 +77,10 @@ fun main(args: Array<String>) {
     for ((index, element) in list.withIndex()) {
         println("list iteration key, value $index = $element");
     }
+
+    //try catch
+    val reader = BufferedReader(StringReader("not a number"));
+    tryCatchStudy(reader);
 
 
 }
@@ -237,4 +244,18 @@ fun fizzBuzz(i: Int) = when {
     i % 3 == 0 -> "Fizz"
     i % 5 == 0 -> "Buzz"
     else -> "$i"
+}
+
+/**
+ * 2.5
+ * 자바랑 비슷함
+ */
+fun tryCatchStudy(reader: BufferedReader) {
+    val number = try {
+        Integer.parseInt(reader.readLine());
+    } catch (e: NumberFormatException) {
+        e.printStackTrace()
+        null
+    }
+    println("tryCatchStudy number : ${number}")
 }
