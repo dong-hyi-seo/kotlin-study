@@ -1,8 +1,10 @@
 package three
 
+import inflearn.Car
 import kotlin.text.StringBuilder
 
 fun main(args: Array<String>) {
+
     collectionStudy()
     callEasyFunc()
     /**
