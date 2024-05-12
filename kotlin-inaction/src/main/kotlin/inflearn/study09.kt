@@ -74,4 +74,9 @@ class Person(
     val isAdult: Boolean
         //expression 표현
         get() = this.age >= 20
+
+    fun nextYearAge(year: Int): Int {
+        println("맴버함수")
+        return this.age;
+    }
 }
